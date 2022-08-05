@@ -1,4 +1,4 @@
-# wordle_cli
+# Wordle CLI
 A kata to create a terminal version of the Wordle game.
 
 ## To run 
