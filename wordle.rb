@@ -27,7 +27,7 @@ class Wordle
                 print @game_logic.check_guess(guess, target_word)
                 puts "\n"
                 @messages.request_word
-                guess = gets.chomp
+                guess = gets.chomp.downcase
                 @game_logic.check_guess(guess, target_word)
                 counter += 1
             end
