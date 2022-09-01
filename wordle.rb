@@ -2,47 +2,48 @@
 
 require_relative 'game_logic'
 require_relative 'messages'
+require_relative 'state_management'
 
 # Game flow
 class Wordle
-  attr_accessor :game_logic, :messages
-  attr_reader :TARGET_WORDS
-
-  TARGET_WORDS = %w[About Alert Argue Beach Above Found Guess Doubt Every Frame Guest
-                    Dozen Exact Frank Guide Draft Exist Fraud Happy Drama Extra Fresh Harry Drawn Faith Front Heart Dream].freeze
+  attr_accessor :game_logic, :messages, :state_management
 
   def initialize
     @game_logic = GameLogic.new
     @messages = Messages.new
+    @state_management = StateManagement.new
   end
 
-  def play
+  def display_messages
     @messages.welcome_message
     @messages.rules
     @messages.request_word
-    counter = 1
-    target_word = TARGET_WORDS.sample.downcase
-    guess = gets.chomp
+  end
 
-    if @game_logic.validate_guess(guess)
-      until @game_logic.win?(@game_logic.check_guess(guess, target_word)) || counter == 5
-        print @game_logic.check_guess(guess, target_word)
-        puts "\n"
+  def play
+    puts "the word was: #{@state_management.target_word}"
+    display_messages
+    user_guess = gets.chomp
+
+    if @state_management.validate_guess(user_guess)
+      until @state_management.won? || @state_management.game_finished?
+        @state_management.guess(user_guess)
+        @state_management.guess_result(user_guess)
+        print "\n"
         @messages.request_word
-        guess = gets.chomp.downcase
-        @game_logic.check_guess(guess, target_word)
-        counter += 1
+        user_guess = gets.chomp
+        @state_management.guess_result(user_guess)
       end
 
-      if @game_logic.win?(@game_logic.check_guess(guess, target_word))
-        @messages.winning_message(target_word)
-        print @game_logic.check_guess(guess, target_word)
-      elsif counter == 5
+      if @state_management.won?
+        print "\n"
+        @messages.winning_message(@state_management.target_word)
+        # @state_management.guess_result(user_guess)
+      elsif @state_management.out_of_lives?
         @messages.out_of_lives
+        @state_management.guess_result(user_guess)
         puts "\n"
-        print @game_logic.check_guess(guess, target_word)
-        puts "\n"
-        puts "the word was: #{target_word}"
+        puts "the word was: #{@state_management.target_word}"
       end
 
     else
@@ -51,6 +52,31 @@ class Wordle
       play
     end
   end
+
+  #   if @state_management.validate_guess(user_guess)
+  #     @state_management.guess(user_guess) until @state_management.won? || @state_management.game_finished?
+  #       @state_management.guess_result(user_guess)
+  #       puts "\n"
+  #       @messages.request_word
+  #       user_guess = gets.chomp.downcase
+  #     end
+
+  #     if @state_management.won?
+  #       @messages.winning_message(@state_management.target_word)
+  #       @state_management.guess_result(user_guess)
+  #     elsif @state_management.out_of_lives?
+  #       @messages.out_of_lives
+  #       puts "\n"
+  #       puts "\n"
+  #       puts "the word was: #{@state_management.target_word}"
+  #     end
+
+  #   else
+  #     @messages.incorrect_word_length
+  #     puts "\n\n"
+  #     play
+  #   end
+  # end
 end
 
 wordle = Wordle.new

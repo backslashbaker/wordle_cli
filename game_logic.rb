@@ -13,11 +13,8 @@ class GameLogic
     end
   end
 
-  def validate_guess(guess)
-    guess.length == 5
+  def win?(word_array)
+    word_array.all? { |letter| letter == 2 }
   end
 
-  def win?(word)
-    word.all? { |letter| letter == 2 }
-  end
 end
