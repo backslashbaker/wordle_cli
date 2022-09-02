@@ -9,15 +9,15 @@ class GameLogic
       correct_letter_and_position = target_letters.include?(letter) && guess_letters.find_index(letter) == target_letters.find_index(letter)
       correct_letter_wrong_position = target_letters.include?(letter) && guess_letters.find_index(letter) != target_letters.find_index(letter)
 
-      correct_letter_and_position ? 2 : correct_letter_wrong_position ? 1 : 0
+      if correct_letter_and_position
+        2
+      else
+        correct_letter_wrong_position ? 1 : 0
+      end
     end
   end
 
-  def validate_guess(guess)
-    guess.length == 5
-  end
-
-  def win?(word)
-    word.all? { |letter| letter == 2 }
+  def win?(word_array)
+    word_array.all? { |letter| letter == 2 }
   end
 end
