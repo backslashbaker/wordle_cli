@@ -15,24 +15,25 @@ class Wordle
   end
 
   def play
-    display_messages
-    user_guess = gets.chomp.downcase
-
-    if @state_machine.validate_guess(user_guess)
-      game_loop(user_guess)
-      if @state_machine.won?
-        print "\n"
-        @messages.winning_message(@state_machine.target_word)
-      elsif @state_machine.out_of_lives?
+    loop do
+      if @state_machine.lost?
         @messages.out_of_lives
         puts "\n"
         puts "the word was: #{@state_machine.target_word}"
+        exit 1
       end
 
-    else
-      @messages.incorrect_word_length
-      puts "\n\n"
-      play
+      if @state_machine.won?
+        @messages.winning_message(@state_machine.target_word)
+        exit 0
+      end
+
+      display_messages
+      
+      user_guess = gets.chomp.downcase
+      
+
+      
     end
   end
 
@@ -41,20 +42,17 @@ class Wordle
   def display_messages
     @messages.welcome_message
     @messages.rules
+    puts "turn #{@state_machine.counter + 1}"
     @messages.request_word
   end
 
-  def game_loop(user_guess)
-    while @state_machine.game_in_progress?
-      @state_machine.guess_result(user_guess)
-      if @state_machine.guess(user_guess)
-        break
-      else
-        print "\n"
-        @messages.request_word
-        user_guess = gets.chomp.downcase
-      end
+  def take_turn(state, guess)
+    unless state.valid? guess
+      @messages.incorrect_word_length
+      next
     end
+
+    state.guess_result guess unless state.correct? guess
   end
 end
 

@@ -18,18 +18,20 @@ class StateManagement
     @game_in_progress = true
   end
 
-  def validate_guess(guess)
+  def valid?(guess)
     guess.length == 5
   end
 
-  def guess(user_guess)
+  def correct?(user_guess)
     @counter += 1
     if @game_logic.win?(@game_logic.check_guess(user_guess, @target_word))
       @game_in_progress = false
       @has_player_won = true
-    elsif @counter == 5
+      true
+    elsif @counter >= 5
       @game_in_progress = false
       @has_game_finished = true
+      false
     end
   end
 
@@ -51,5 +53,9 @@ class StateManagement
 
   def won?
     @has_player_won
+  end
+
+  def lost?
+    game_finished? and !won?
   end
 end
